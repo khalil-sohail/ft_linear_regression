@@ -1,161 +1,82 @@
+from math import sqrt
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
 
 
 class ft_linear_regression:
-    def __init__(self, learning_rate=0.1, epochs=1000, theta0=0, theta1=0, xMin=0, yMin=0, xMax=0, yMax=0):
+    def __init__(self, learning_rate=0.1, epochs=1000):
         self.learning_rate = learning_rate
         self.epochs = epochs
-        self.theta0 = theta0
-        self.theta1 = theta1
-        self.xMin = xMin
-        self.yMin = yMin
-        self.xMax = xMax
-        self.yMax = yMax
+        self.theta0 = 0
+        self.theta1 = 0
+        self.xMin   = 0
+        self.yMin   = 0
+        self.xMax   = 0
+        self.yMax   = 0
+        self.scaler = 0
+        self.X      = []
+        self.Y      = []
     
     def fit(self, x, y):
-        xMin = np.min(x)
-        yMin = np.min(y)
-        xMax = np.max(x)
-        yMax = np.max(y)
+        self.xMin = np.min(x)
+        self.yMin = np.min(y)
+        self.xMax = np.max(x)
+        self.yMax = np.max(y)
 
-        X = (x - xMin) / (xMax - xMin)  # Min-Max Scaling
-        Y = (y - yMin) / (yMax - yMin)
+        self.X = (x - self.xMin) / (self.xMax - self.xMin)  # Min-Max Scaling
+        self.Y = (y - self.yMin) / (self.yMax - self.yMin)
 
 
-        scaler = yMax - yMin
-        n = float(len(X))
+        self.scaler = self.yMax - self.yMin
+        n = float(len(self.X))
 
         for i in range(self.epochs):
-            Y_preds = self.theta0 + (X * self.theta1)
-
-
-            # if i % 100 == 0:
-            #     print(f"Iteration {i}: theta0={theta0}, theta1={theta1}")
-
-            #     if input("plot?: ") != 'n':
-            #         estPrice_original_plt = (theta0 + (theta1 * X)) * scaler + y.min()
-            #         plt.figure(figsize=(10, 6))
-            #         plt.scatter(x, y, label="Actual Data", color='blue')
-            #         plt.plot(x, estPrice_original_plt, label="Regression Line", color='red')
-            #         plt.legend()
-            #         plt.show()
-
-            self.theta0 -= self.learning_rate * (1/n) * np.sum(Y_preds - Y)
-            self.theta1 -= self.learning_rate * 1/n * np.sum((Y_preds - Y) * X)
+            Y_preds = self.theta0 + (self.X * self.theta1)
+            self.theta0 -= self.learning_rate * (1/n) * np.sum(Y_preds - self.Y)
+            self.theta1 -= self.learning_rate * 1/n * np.sum((Y_preds - self.Y) * self.X)
 
     def predict(self, mileage):
         scaledMileage = (mileage - self.xMin) / (self.xMax - self.xMin)
         estPrice_original = (self.theta0 + (self.theta1  * scaledMileage)) * self.scaler + self.yMin
 
-        print(f"estimatePrice(mileage): {estPrice_original}")
+        # print(f"estimatePrice(mileage): {estPrice_original}")
+        return estPrice_original
 
-    def score():
-        pass
+    def score(self, y_true, y_preds):
+        if len(y_true) != len(y_preds):
+            raise Exception("len(y_preds) != len(y_preds)")
+        RMSE = sqrt(1/len(y_true) * (np.sum((y_true - y_preds)**2)))
+        print(f"RMSE score: {RMSE}")
+        return RMSE
 
-    def get_the_t0_t1():
-        pass
+    # def get_the_t0_t1(self):
+    #     return self.theta0, self.theta1
+
+    def plot(self, x, y):
+        estPrice_original_plt = (self.theta0 + (self.theta1 * self.X)) * self.scaler + self.yMin
+        plt.figure(figsize=(10, 6))
+        plt.scatter(x, y, label="Actual Data", color='blue')
+        plt.plot(x, estPrice_original_plt, label="Regression Line", color='red')
+        plt.legend()
+        plt.show()
 
 def main():
     df = pd.read_csv('data/data.csv')
     X, Y = df['km'], df['price']
 
-    # x, y = df['km'], df['price']
-    # theta0 = 0
-    # theta1 = 0
-    
-    # learning_r = 0.1
-    # epochs = 1500
-    # n = float(len(X))
-
-    # X = (X - np.min(X)) / (np.max(X) - np.min(X))  # Min-Max Scaling
-    # Y = (Y - np.min(Y)) / (np.max(Y) - np.min(Y))
-
-    # scaler = (y.max() - y.min())
-
-    # for i in range(epochs):
-    #     Y_preds = theta0 + (X * theta1)
-    #     if i % 100 == 0:
-    #         print(f"Iteration {i}: theta0={theta0}, theta1={theta1}")
-
-    #         if input("plot?: ") != 'n':
-    #             estPrice_original_plt = (theta0 + (theta1 * X)) * scaler + y.min()
-    #             plt.figure(figsize=(10, 6))
-    #             plt.scatter(x, y, label="Actual Data", color='blue')
-    #             plt.plot(x, estPrice_original_plt, label="Regression Line", color='red')
-    #             plt.legend()
-    #             plt.show()
-
-    #     theta0 -= learning_r * (1/n) * np.sum(Y_preds - Y)
-    #     theta1 -= learning_r * 1/n * np.sum((Y_preds - Y) * X)
     lr = ft_linear_regression()
+    
     lr.fit(X, Y)
 
+
     mileage = int(input("your mileage is: "))
-    lr.predict(mileage)
-
-    # scaledMileage = (mileage - np.min(x)) / (np.max(x) - np.min(x))
-    # estPrice_original = (theta0 + (theta1  * scaledMileage)) * scaler + y.min()
-    # estPrice_original_plt = (theta0 + (theta1 * X)) * scaler + y.min()
-
-    # print(f"estimatePrice(mileage): {estPrice_original}")
-    # if input("plot?: ") == 'y':
-    #     plt.figure(figsize=(10, 6))
-    #     plt.scatter(x, y, label="Actual Data", color='blue')
-    #     plt.plot(x, estPrice_original_plt, label="Regression Line", color='red')
-    #     plt.legend()
-    #     plt.show()
-    
+    print(f"estimatePrice(mileage): {lr.predict(mileage)}")
+    y_preds = lr.predict(X)
+    lr.score(Y, y_preds)
+    lr.plot(X, Y)
 
 if __name__ == "__main__":
     main()
 
-
-
-# def main():
-#     df = pd.read_csv('data/data.csv')
-#     X, Y = df['km'], df['price']
-#     x, y = df['km'], df['price']
-#     theta0 = 0
-#     theta1 = 0
-    
-#     learning_r = 0.1
-#     epochs = 1500
-#     n = float(len(X))
-
-#     X = (X - np.min(X)) / (np.max(X) - np.min(X))  # Min-Max Scaling
-#     Y = (Y - np.min(Y)) / (np.max(Y) - np.min(Y))
-
-#     scaler = (y.max() - y.min())
-
-#     for i in range(epochs):
-#         Y_preds = theta0 + (X * theta1)
-#         if i % 100 == 0:
-#             print(f"Iteration {i}: theta0={theta0}, theta1={theta1}")
-
-#             if input("plot?: ") != 'n':
-#                 estPrice_original_plt = (theta0 + (theta1 * X)) * scaler + y.min()
-#                 plt.figure(figsize=(10, 6))
-#                 plt.scatter(x, y, label="Actual Data", color='blue')
-#                 plt.plot(x, estPrice_original_plt, label="Regression Line", color='red')
-#                 plt.legend()
-#                 plt.show()
-
-#         theta0 -= learning_r * (1/n) * np.sum(Y_preds - Y)
-#         theta1 -= learning_r * 1/n * np.sum((Y_preds - Y) * X)
-
-#     mileage = int(input("your mileage is: "))
-
-#     scaledMileage = (mileage - np.min(x)) / (np.max(x) - np.min(x))
-#     estPrice_original = (theta0 + (theta1  * scaledMileage)) * scaler + y.min()
-#     estPrice_original_plt = (theta0 + (theta1 * X)) * scaler + y.min()
-
-#     print(f"estimatePrice(mileage): {estPrice_original}")
-#     if input("plot?: ") == 'y':
-#         plt.figure(figsize=(10, 6))
-#         plt.scatter(x, y, label="Actual Data", color='blue')
-#         plt.plot(x, estPrice_original_plt, label="Regression Line", color='red')
-#         plt.legend()
-#         plt.show()
-    
