@@ -1,6 +1,8 @@
+import pickle
+
 def main():
-    theta0 = 1.5
-    theta1 = 1.5
+    with open('data.dat', 'rb') as f:
+        theta0, theta1 = pickle.load(f)
 
 
     mileage = int(input("your mileage is: "))
