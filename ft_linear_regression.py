@@ -61,6 +61,9 @@ class ft_linear_regression:
         plt.scatter(x, y, label="Actual Data", color='blue')
         plt.plot(x, estPrice_original_plt, label="Regression Line", color='red')
         plt.legend()
+        plt.title("Price/Mileage")
+        plt.xlabel("Mileage")
+        plt.ylabel("Price")
         plt.show()
 
 def main():
@@ -73,6 +76,9 @@ def main():
         plt.figure(figsize=(10, 6))
         plt.scatter(X, Y, label="Actual Data", color='blue')
         plt.legend()
+        plt.title("Price/Mileage")
+        plt.xlabel("Mileage")
+        plt.ylabel("Price")    
         plt.show()
     elif plot != "no":
         print(f"unkown keyword: `{plot}`")
