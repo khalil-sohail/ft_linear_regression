@@ -1,12 +1,12 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
 from math import sqrt
 import pickle
 
 class ft_linear_regression:
     def __init__(self, learning_rate=0.1, epochs=1000):
+        """Initialize model hyperparameters and internal state."""
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.fitted = False
@@ -14,28 +14,35 @@ class ft_linear_regression:
         self.theta1 = 0
 
     def fit(self, x, y):
-        # Min-Max Scaling
+        """Train linear regression using gradient descent and save learned thetas."""
         X = (x - np.min(x)) / (np.max(x) - np.min(x))
         Y = (y - np.min(y)) / (np.max(y) - np.min(y))
         n = float(len(X))
 
-        for i in range(self.epochs):
+        for _ in range(self.epochs):
             Y_preds = self.theta0 + (X * self.theta1)
-            self.theta0 -= self.learning_rate * (1/n) * np.sum(Y_preds - Y)
-            self.theta1 -= self.learning_rate * 1/n * np.sum((Y_preds - Y) * X)
+
+            new_theta0 = self.theta0 - self.learning_rate * (1/n) * np.sum(Y_preds - Y)
+            new_theta1 = self.theta1 - self.learning_rate * 1/n * np.sum((Y_preds - Y) * X)
+
+            self.theta0 = new_theta0
+            self.theta1 = new_theta1
+
         self.fitted = True
         self.theta1 *= (y.max() - y.min()) / (x.max() - x.min())
         self.theta0 = (self.theta0 * (y.max() - y.min())) + y.min() - (self.theta1 * x.min())
-        with open('data.dat', 'wb') as f:
+        with open('module.dat', 'wb') as f:
             pickle.dump((self.theta0, self.theta1), f)
 
     def predict(self, mileage):
+        """Return estimated price for a mileage value or vector."""
         if self.fitted != True:
             raise Exception("the model isn't fitted yet")
         estPrice_original = (self.theta0 + (self.theta1  * mileage))
         return estPrice_original
 
     def score(self, y_true, y_preds, prt=True):
+        """Compute and optionally print regression metrics from predictions."""
         if self.fitted != True:
             raise Exception("the model isn't fitted yet")
         if len(y_true) != len(y_preds):
@@ -54,6 +61,7 @@ class ft_linear_regression:
         return R2
 
     def plot(self, x, y):
+        """Display scatter data and the fitted regression line."""
         if self.fitted != True:
             raise Exception("the model isn't fitted yet")
         estPrice_original_plt = (self.theta0 + (self.theta1 * x))
@@ -67,6 +75,7 @@ class ft_linear_regression:
         plt.show()
 
 def main():
+    """Train the model from CSV and optionally visualize data and fitted line."""
     df = pd.read_csv('data/data.csv')
     X, Y = df['km'], df['price']
 
@@ -85,7 +94,6 @@ def main():
     lr.fit(X, Y)
     plot = input("Plotting the line resulting from your linear regression? (yes or no): ")
     if plot == "yes":
-        y_preds = lr.predict(X)
         lr.plot(X, Y)
     elif plot != "no":
         print(f"unkown keyword: `{plot}`")

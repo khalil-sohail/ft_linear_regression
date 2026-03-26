@@ -16,10 +16,10 @@ This project implements a simple **Linear Regression model** to predict the pric
 ```
 ft_linear_regression/
 │── data/                   # Folder containing dataset files
-│── data.dat                # file contains theta0 and theta1
 │── ft_linear_regression.py # Training script (gradient descent)
 │── predict.py              # Prediction script
 │── precision.py            # Model evaluation script
+│── FUNCTIONS.md            # Functions documentation
 │── README.md               # Project documentation (this file)
 ```
 
@@ -32,7 +32,7 @@ python ft_linear_regression.py
 ```
 - This will read data from `data/data.csv`
 - Train a linear regression model using **Gradient Descent**
-- Save the trained parameters (`theta0` and `theta1`) in a file
+- Save the trained parameters (`theta0` and `theta1`) in a file named module.dat using pickle
 
 ### 2️⃣ Make Predictions
 To predict the price of a car given its mileage:
@@ -70,7 +70,7 @@ pip install numpy pandas matplotlib
 
 ## 📝 Notes
 - The dataset (`data/data.csv`) should contain **two columns**: `km` (mileage) and `price`
-- The model parameters (`theta0` and `theta1`) are stored in `data.dat` and set to 0 before training
+- The model parameters (`theta0` and `theta1`) are stored in `module.dat` and set to 0 before training
 - Ensure that the dataset does not contain missing or corrupted values before training
 
 ## 📌 Author
